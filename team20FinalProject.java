@@ -56,32 +56,29 @@ public class team20FinalProject {
     static String adminPassword = "00000000";
 
 // inputs for user methods
-    static String ID;
-    static String Name;
-    static String Email;
-    static String PhoneNumber;
-    static String Email2;
-    static String PhoneNumber2;
     static String UserTransferInput;
     static int choice;
 
 // For transactions history saving
-    static String TransactionID[] = new String[1000];
-    static int SinderIndex[] = new int[1000];
-    static int RecieverIndex[] = new int[1000];
-    static double transferAmount[] = new double[1000];
-    static boolean transactionStatus[] = new boolean[1000];
+    static String TransactionID[] = new String[10000];
+    static int SinderIndex[] = new int[10000];
+    static int RecieverIndex[] = new int[10000];
+    static double transferAmount[] = new double[10000];
+    static boolean transactionStatus[] = new boolean[10000];
     static int TotalNumberOfTransaction = 0;
     static int TotalNumberOfCorrectTransaction = 0;
     static int TotalNumberOfFailedTransaction = 0;
     static int TotalAmount = 0;
 
+
+// Related with account creating
     static void Idhistory(int id) {
         System.out.println("ID IS :" + NormalUsersAccounts_ID[id]);
     }
 
 //Admin methods
-// Used to Print all some statistics of the program it works woth for loop
+
+    //showStatistics Used to Print all some statistics of the program it works woth for loop
     static void showStatistics() {
         int NumberOfUsers = UsersCount;
         int NumberOfActiveUsers = 0;
@@ -92,13 +89,16 @@ public class team20FinalProject {
         }
         int NumberOfBlockedUsers = UsersCount - NumberOfActiveUsers;
         for (int i = 0; i < TotalNumberOfTransaction; i++) {
+            if(transactionStatus[i] == true){
             TotalAmount += transferAmount[i];
+            }
         }
 
         System.out.println("\n====Program stastics=====");
         System.out.println("Total number of registered users : " + NumberOfUsers + "\nNumber of Active users : " + NumberOfActiveUsers + "\nNumber of blocked accounts : " + NumberOfBlockedUsers + "\nNumber of Succussful Transaction : " + TotalNumberOfCorrectTransaction + "\nNumber of failed Transaction : " + TotalNumberOfFailedTransaction + "\nTotal transaction amount : " + TotalAmount);
     }
 
+    //Search user allow the admin to search for any user and know more info about that user
     static void searchUser() {
         System.out.print("\nHow you want to search ? (1.By ID 2. By Full Name 3.By Phone number 4.By Email Adress)");
         int SearchAdminChoice = input.nextInt();
@@ -173,6 +173,7 @@ public class team20FinalProject {
 
     }
 
+    // View all Users allows the admin to view all users registered on the system to check for any info
     static void viewAllUsers() {
         System.out.println("\n=====All Users=====\n");
         for (int i = 0; i < UsersCount; i++) {
@@ -268,6 +269,7 @@ public class team20FinalProject {
 
     }
 
+    // Block account allow the admin to change the status of any account to false (Blocked)
     static void blockAccount() {
         System.out.println("\n====Block Account (Admin only)====");
         System.out.println("Enter the User ID of the account : ");
@@ -288,6 +290,7 @@ public class team20FinalProject {
         }
     }
 
+    // Block account allow the admin to change the status of any account to true (UnBlocked)
     static void unblockAccount() {
         System.out.println("\n====Unblock account(Admin only)====");
         System.out.println("Enter the User ID of the account you want to unblock : ");
@@ -308,6 +311,7 @@ public class team20FinalProject {
         }
     }
 
+    // View user details allows the admin to view all info about specific user
     static void viewUserDetails() {
         System.out.println("\n====View User (Admin only)=====");
         System.out.println("Enter the User ID : ");
@@ -327,27 +331,32 @@ public class team20FinalProject {
         }
     }
 
+    // Show all transaction allow the admin to view all transaction history
     static void showAllTransaction() {
         System.out.println("\n==== Transaction History ====");
-        for (int i = 0; i < TotalNumberOfCorrectTransaction; i++) {
-
+        if(TotalNumberOfTransaction == 0){
+            System.out.println("No transactions yet.");
+        }
+        for (int i = 0; i < TotalNumberOfTransaction; i++) {
             System.out.println("Transaction ID : " + TransactionID[i]);
             System.out.println("From : " + NormalUsersAccounts_Name[SinderIndex[i]]);
             System.out.println("To : " + NormalUsersAccounts_Name[RecieverIndex[i]]);
+            System.out.println("Trasfer amount : " + transferAmount[i]);
             System.out.println("Transfer status : " + transactionStatus[i]);
             System.out.println("-------");
         }
     }
 
+
 // User methods
-// Show balance method to show the balance of loggen in user
+    // Show balance method to show the balance of loggen in user
     static void showBalance(int UsertempIndexForTheProgram) {
         System.out.println("\n====Account Balance====");
         System.out.println("Name : " + NormalUsersAccounts_Name[UsertempIndexForTheProgram] + "\nBalance : " + NormalUsersAccounts_Balance[UsertempIndexForTheProgram]);
         System.out.println("------------------");
     }
 
-// Check for account exist code to transfer money & and money transfer calculations
+    // Check for account exist code to transfer money & and money transfer calculations
     static void AccountTransferMoneyCheck(int TransferChoice) {
         double transmoney = 0;
         boolean TransferCheck = false;
@@ -361,6 +370,61 @@ public class team20FinalProject {
                     UserEmailInputIndex = i;
                     break;
                 }
+            }
+            if (TransferCheck == false) {
+                System.out.println("Invalid Email or Phone Number , You should write a correct existing account");
+            }
+
+            boolean transactionStatus_var = false;
+            if (TransferCheck == true) {
+                System.out.println("Correct");
+                System.out.print("Enter the amount to transfer :");
+                transmoney = input.nextDouble();
+
+                if (transmoney < 0 || transmoney > NormalUsersAccounts_Balance[UsertempIndexForTheProgram]) {
+                    String transID = "A000" + TotalNumberOfTransaction;
+                    System.out.println("Invalid amount.");
+                    transactionStatus[TotalNumberOfTransaction] = false;
+                    // Saving history in the array -->
+                    TransactionID[TotalNumberOfTransaction] = transID;
+                    SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                    RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                    transferAmount[TotalNumberOfTransaction] = transmoney;
+                    TotalNumberOfFailedTransaction++;
+                    TotalNumberOfTransaction++;
+                }else if (NormalUsersAccounts_Status[UsertempIndexForTheProgram] == false || NormalUsersAccounts_Status[UserEmailInputIndex] == false) {
+                System.out.println("Transaction failed, one of the accounts is not active");
+                String transID = "A000" + TotalNumberOfTransaction;
+                transactionStatus[TotalNumberOfTransaction] = false;
+                // Saving history in the array -->
+                TransactionID[TotalNumberOfTransaction] = transID;
+                SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                transferAmount[TotalNumberOfTransaction] = transmoney;
+                TotalNumberOfFailedTransaction++;
+                TotalNumberOfTransaction++;
+                } else {
+                String transID = "A000" + TotalNumberOfTransaction;
+
+                        // Saving history in the array -->
+                TransactionID[TotalNumberOfTransaction] = transID;
+                SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                transferAmount[TotalNumberOfTransaction] = transmoney;
+                NormalUsersAccounts_Balance[UsertempIndexForTheProgram] -= transmoney;
+                NormalUsersAccounts_Balance[UserEmailInputIndex] += transmoney;
+                transactionStatus_var = true;
+                transactionStatus[TotalNumberOfTransaction] = transactionStatus_var;
+                System.out.println("\n==== Transaction Details ====");
+                System.out.println("Transaction ID : " + TransactionID[TotalNumberOfTransaction]);
+                System.out.println("From : " + NormalUsersAccounts_Name[SinderIndex[TotalNumberOfTransaction]]);
+                System.out.println("To : " + NormalUsersAccounts_Name[RecieverIndex[TotalNumberOfTransaction]]);
+                System.out.println("Transfer amount : " + transmoney);
+                System.out.println("Transfer status : " + transactionStatus_var);
+                System.out.println("New Balance : " + NormalUsersAccounts_Balance[UsertempIndexForTheProgram]);
+                TotalNumberOfCorrectTransaction++;
+                TotalNumberOfTransaction++;
+            }
             }
         } else if (TransferChoice == 0) {
             System.out.print("Enter your PhoneNumber :");
@@ -383,20 +447,31 @@ public class team20FinalProject {
                 transmoney = input.nextDouble();
 
                 if (transmoney < 0 || transmoney > NormalUsersAccounts_Balance[UsertempIndexForTheProgram]) {
+                    String transID = "A000" + TotalNumberOfTransaction;
                     System.out.println("Invalid amount.");
+                    transactionStatus[TotalNumberOfTransaction] = false;
+                    // Saving history in the array -->
+                    TransactionID[TotalNumberOfTransaction] = transID;
+                    SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                    RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                    transferAmount[TotalNumberOfTransaction] = transmoney;
                     TotalNumberOfFailedTransaction++;
                     TotalNumberOfTransaction++;
-                    transactionStatus[TotalNumberOfTransaction] = false;
-                }
-            } else if (NormalUsersAccounts_Status[UsertempIndexForTheProgram] == false || NormalUsersAccounts_Status[UserEmailInputIndex] == false) {
+                }else if (NormalUsersAccounts_Status[UsertempIndexForTheProgram] == false || NormalUsersAccounts_Status[UserEmailInputIndex] == false) {
                 System.out.println("Transaction failed, one of the accounts is not active");
+                String transID = "A000" + TotalNumberOfTransaction;
+                transactionStatus[TotalNumberOfTransaction] = false;
+                // Saving history in the array -->
+                TransactionID[TotalNumberOfTransaction] = transID;
+                SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                transferAmount[TotalNumberOfTransaction] = transmoney;
                 TotalNumberOfFailedTransaction++;
                 TotalNumberOfTransaction++;
-                transactionStatus[TotalNumberOfTransaction] = false;
-            } else {
+                } else {
                 String transID = "A000" + TotalNumberOfTransaction;
 
-// Saving history in the array -->
+                        // Saving history in the array -->
                 TransactionID[TotalNumberOfTransaction] = transID;
                 SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
                 RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
@@ -415,6 +490,7 @@ public class team20FinalProject {
                 TotalNumberOfCorrectTransaction++;
                 TotalNumberOfTransaction++;
             }
+            } 
         }
 
     }
@@ -422,7 +498,7 @@ public class team20FinalProject {
 // Transfer Money , printing and calling the main method of transfaring according to the correct choice
     static void TransferMoney() {
 
-// choose a way to transfer
+        // choose a way to transfer
         System.out.println("Choose a way to transfer (select the user you will send to) :");
         System.out.println("1.By Phone Number : ");
         System.out.println("2.By Email");
@@ -437,7 +513,7 @@ public class team20FinalProject {
         }
     }
 
-// PRtin transaction for specific loggen in user
+    // Prtin transaction for specific loggen in user
     static void showTransactionHistoryforUser() {
         boolean historyExisist = false;
         System.out.println("\nAll history for account " + NormalUsersAccounts_Name[UsertempIndexForTheProgram]);
