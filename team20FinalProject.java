@@ -933,6 +933,20 @@ public class team20FinalProject{
                                 String newpassword=input.next();
                                 System.out.println("Confirm password:");
                                 String confirmpassword=input.next();
+                             while(!confirmpassword.equals(newpassword)){
+                           System.out.println("Password do not match");
+                     System.out.println("Enter 0 to return to Main Menu");
+                        System.out.println("Enter 1 to try again");
+                        int retry=input.nextInt();
+                          if(retry == 0){
+                            break;
+                          }else if(retry==1){
+                         System.out.println("Ente password again");
+                         newpassword=input.next();
+                      System.out.println("confirm password");
+                        confirmpassword=input.next();
+                           }else{
+                     System.out.println("INVALID CHOICE!!!");
                                 if (newpassword.length() < 8){
                                     System.out.println("Password should be at least 8 charcters");
                                     break;
@@ -987,6 +1001,8 @@ public class team20FinalProject{
                             }
                         }
                     break;
+                            }
+                    }
             case 2:
                 System.out.println("=====ADMIN LOGIN=====");
                 System.out.println("Enter Admin username : ");
