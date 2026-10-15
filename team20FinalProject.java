@@ -371,13 +371,19 @@ public class team20FinalProject {
                     break;
                 }
             }
+            boolean selfSendCheck = false;
+            if(UsertempIndexForTheProgram == UserEmailInputIndex){
+                selfSendCheck = true;
+            }else{
+                System.out.println("You can not send money to your self");
+            }
             if (TransferCheck == false) {
                 System.out.println("Invalid Email or Phone Number , You should write a correct existing account");
             }
 
             boolean transactionStatus_var = false;
-            if (TransferCheck == true) {
-                System.out.println("Correct");
+            if (TransferCheck == true && selfSendCheck == false) {
+                System.out.println("Account found");
                 System.out.print("Enter the amount to transfer :");
                 transmoney = input.nextDouble();
 
@@ -439,10 +445,16 @@ public class team20FinalProject {
             if (TransferCheck == false) {
                 System.out.println("Invalid Email or Phone Number , You should write a correct existing account");
             }
+            boolean selfSendCheck = false;
+            if(UsertempIndexForTheProgram == UserEmailInputIndex){
+                selfSendCheck = true;
+            }else{
+                System.out.println("You can not send money to your self");
+            }
 
             boolean transactionStatus_var = false;
-            if (TransferCheck == true) {
-                System.out.println("Correct");
+            if (TransferCheck == true && selfSendCheck == false) {
+                System.out.println("Account found");
                 System.out.print("Enter the amount to transfer :");
                 transmoney = input.nextDouble();
 
@@ -491,6 +503,70 @@ public class team20FinalProject {
                 TotalNumberOfTransaction++;
             }
             } 
+        }else if (TransferChoice == 2) {
+            showFavorites();
+            int LocalFavChoice;
+            boolean transactionStatus_var = false;
+            
+            
+            if (FavoritesCountForEachUser[UsertempIndexForTheProgram] > 0){
+                System.out.println("Choose account (write only each order like (1 or 2 etc.))");
+                LocalFavChoice = input.nextInt();
+                UserEmailInputIndex = NormalUsersFavoriteAccountIndex[UsertempIndexForTheProgram][(LocalFavChoice - 1)];
+                
+                
+                if(UserEmailInputIndex < (FavoritesCountForEachUser[UsertempIndexForTheProgram] - 1) || UserEmailInputIndex < 0){
+                    System.out.println("Invalid Choice");
+                }else{
+                    System.out.print("Enter the amount to transfer :");
+                    transmoney = input.nextDouble();
+
+                if (transmoney < 0 || transmoney > NormalUsersAccounts_Balance[UsertempIndexForTheProgram]) {
+                    String transID = "A000" + TotalNumberOfTransaction;
+                    System.out.println("Invalid amount.");
+                    transactionStatus[TotalNumberOfTransaction] = false;
+                    // Saving history in the array -->
+                    TransactionID[TotalNumberOfTransaction] = transID;
+                    SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                    RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                    transferAmount[TotalNumberOfTransaction] = transmoney;
+                    TotalNumberOfFailedTransaction++;
+                    TotalNumberOfTransaction++;
+                }else if (NormalUsersAccounts_Status[UsertempIndexForTheProgram] == false || NormalUsersAccounts_Status[UserEmailInputIndex] == false) {
+                System.out.println("Transaction failed, one of the accounts is not active");
+                String transID = "A000" + TotalNumberOfTransaction;
+                transactionStatus[TotalNumberOfTransaction] = false;
+                // Saving history in the array -->
+                TransactionID[TotalNumberOfTransaction] = transID;
+                SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                transferAmount[TotalNumberOfTransaction] = transmoney;
+                TotalNumberOfFailedTransaction++;
+                TotalNumberOfTransaction++;
+                } else {
+                String transID = "A000" + TotalNumberOfTransaction;
+
+                        // Saving history in the array -->
+                TransactionID[TotalNumberOfTransaction] = transID;
+                SinderIndex[TotalNumberOfTransaction] = UsertempIndexForTheProgram;
+                RecieverIndex[TotalNumberOfTransaction] = UserEmailInputIndex;
+                transferAmount[TotalNumberOfTransaction] = transmoney;
+                NormalUsersAccounts_Balance[UsertempIndexForTheProgram] -= transmoney;
+                NormalUsersAccounts_Balance[UserEmailInputIndex] += transmoney;
+                transactionStatus_var = true;
+                transactionStatus[TotalNumberOfTransaction] = transactionStatus_var;
+                System.out.println("\n==== Transaction Details ====");
+                System.out.println("Transaction ID : " + TransactionID[TotalNumberOfTransaction]);
+                System.out.println("From : " + NormalUsersAccounts_Name[SinderIndex[TotalNumberOfTransaction]]);
+                System.out.println("To : " + NormalUsersAccounts_Name[RecieverIndex[TotalNumberOfTransaction]]);
+                System.out.println("Transfer amount : " + transmoney);
+                System.out.println("Transfer status : " + transactionStatus_var);
+                System.out.println("New Balance : " + NormalUsersAccounts_Balance[UsertempIndexForTheProgram]);
+                TotalNumberOfCorrectTransaction++;
+                TotalNumberOfTransaction++;
+            }
+                }
+            }
         }
 
     }
@@ -502,6 +578,7 @@ public class team20FinalProject {
         System.out.println("Choose a way to transfer (select the user you will send to) :");
         System.out.println("1.By Phone Number : ");
         System.out.println("2.By Email");
+        System.out.println("3.Choose from favorites");
         choice = input.nextInt();
         switch (choice) {
             case (1):
@@ -510,10 +587,16 @@ public class team20FinalProject {
             case (2):
                 AccountTransferMoneyCheck(1);
                 break;
+            case (3):
+                AccountTransferMoneyCheck(2);
+                break;
+            default:
+                System.out.println("Invalid choice");
+                break;
         }
     }
 
-    // Prtin transaction for specific loggen in user
+    // Print transaction for specific loggen in user
     static void showTransactionHistoryforUser() {
         boolean historyExisist = false;
         System.out.println("\nAll history for account " + NormalUsersAccounts_Name[UsertempIndexForTheProgram]);
@@ -531,7 +614,7 @@ public class team20FinalProject {
             System.out.println("No history for this account.");
         }
     }
-
+    // Add fav method allows the user to add any account as a fav contact
     static void addFavorite() {
         System.out.println("\n====Add favorite accounts====");
         System.out.println("Enter favorite phone number : ");
@@ -570,6 +653,7 @@ public class team20FinalProject {
 
     }
 
+    // Allows the user to remove any fav accounts
     static void removeFavorite() {
         System.out.println("\n====Remove favorite===== ");
         System.out.println("Enter the phone number you want to remove from favorites : ");
@@ -591,6 +675,7 @@ public class team20FinalProject {
         }
     }
 
+    //Show fav method Allow the user to show all his fav accounts
     static void showFavorites() {
         System.out.println("\n====Your Fav contacts=====");
         if (FavoritesCountForEachUser[UsertempIndexForTheProgram] > 0) {
@@ -605,6 +690,7 @@ public class team20FinalProject {
 
     }
 
+    // Search method for the user allows him to search about any other acount and find some info that can help him in money transactions
     static void searchRecipient() {
         System.out.print("\nHow you want to search ? (1.By ID 2. By Full Name 3.By Phone number 4.By Email Adress)");
         int SearchUserChoice = input.nextInt();
@@ -676,6 +762,7 @@ public class team20FinalProject {
 
         }
     }
+
 
 //View Profile to allow the user to view thier profile details
     static void viewProfile() {
@@ -756,6 +843,7 @@ public class team20FinalProject {
                 break;
         }
     }
+
 
     public static void main(String[] args) {
         while (true) {
